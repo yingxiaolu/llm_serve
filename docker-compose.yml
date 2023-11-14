@@ -11,5 +11,5 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     container_name: "llm_web_serve"
-    networks_mode: "host"
+    network_mode: "host"
 
