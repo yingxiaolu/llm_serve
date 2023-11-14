@@ -7,13 +7,9 @@ services:
     command:
       - /bin/sh
       - -c
-      - "gunicorn -t 120 -w 4 -b 0.0.0.0:96 'flaskr:app'"
-    ports:
-      - "5002:96"
+      - "gunicorn -t 120 -w 4 -b 0.0.0.0:5002 'flaskr:app'"
     environment:
       - PYTHONUNBUFFERED=1
     container_name: "llm_web_serve"
-    networks:
-      - app_net
-networks:
-  app_net:
+    networks_mode: "host"
+
