@@ -9,7 +9,7 @@ services:
       - -c
       - "gunicorn -t 120 -w 4 -b 0.0.0.0:96 'flaskr:app'"
     ports:
-      - "96:96"
+      - "96:5002"
     environment:
       - PYTHONUNBUFFERED=1
     container_name: "chatgpt_serve"
