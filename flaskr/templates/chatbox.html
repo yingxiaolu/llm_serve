@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Chatgpt{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex flex-row-reverse mb-3">
+        <a href="/logs">
+        <button type="button" class="btn btn-secondary">Logs</button>
+        </a>
+    </div>
+    <div class="input-group mb-3">
+        <textarea class="form-control" id="chatinput" rows="3" placeholder="Please input chat" value="" onkeyup="count_token()"></textarea>
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button"
+                    style="background-color: #fff; border-left-width: 0; border-top-color: #ced4da; border-bottom-color: #ced4da;"
+                    onclick="clear_input()">X
+            </button>
+            <button class="btn btn-outline-secondary" type="button" id="submit" onclick="submit()">Submit</button>
+        </div>
+    </div>
+    <div class="input-group mb-5">
+        token count：
+        <span class="badge badge-secondary" id="count_token">0</span>
+    </div>
+    <div class="input-group mb-2">
+        <label for="temperature">temperature(0~1)</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="temperature" value="1"/>
+        </div>
+    </div>
+    <!-- 
+    <div class="input-group mb-2">
+        <label for="max_tokens">max_tokens</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="max_tokens" value="inf"/>
+        </div>
+    </div>
+    <div class="input-group mb-2">
+        <label for="presence_penalty">presence_penalty(-2.0~2.0)</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="presence_penalty" value="0"/>
+        </div>
+    </div>
+    <div class="input-group mb-2">
+        <label for="frequency_penalty">frequency_penalty(-2.0~2.0)</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="frequency_penalty" value="0"/>
+        </div>
+    </div>
+    -->
+    <div id="chatbox"></div>
+</div>
+<script type="text/javascript">
+    let messages = []
+    let message_shows = []
+    let btnDisabled = false
+    let timestamp = (new Date()).valueOf();
+
+    function clear_input(){
+        $('#chatinput').val('')
+    }
+
+    function insertHtml(messages){
+        let messages_reverse = []
+        for(let i=messages.length -1; i>=0; i--){
+            messages_reverse.push(messages[i])
+        }
+
+        let html = ''
+        for(let i=0; i<messages_reverse.length; i++) {
+            const msg = messages_reverse[i]
+            if(msg['role'] == 'user') {
+                html += `<div class="alert alert-primary" role="alert" style="white-space: pre-line; text-align: left">${msg['content']}</div>`
+            }else{
+                html += `<div class="alert alert-dark" role="alert" style="white-space: pre-line; text-align: left"><span class="badge badge-info">${msg['finish_reason']}</span><br/>${msg['content']}</div>`
+            }
+        }
+        $('#chatbox').html(html)
+    }
+
+    let count_flag = false
+    function count_token(){
+        if (count_flag){
+            return ''
+        }
+        count_flag = true
+
+        $.ajax({
+            url: "/count_token",
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({"input": $('#chatinput').val()}),
+            dataType: 'json',
+            success: function(res){
+                count_flag = false
+                $("#count_token").text(res['total_tokens'])
+            },
+            error: function(res){
+                count_flag = false
+                console.log('error', res)
+            }
+        });
+    }
+
+    function submit(){
+        if (btnDisabled) {
+            return ''
+        }
+        btnDisabled = true
+
+        messages.push({"role": "user", "content": $('#chatinput').val()})
+        message_shows.push({"role": "user", "content": $('#chatinput').val()})
+        insertHtml(message_shows)
+
+        const temperature = $('#temperature').val()
+        /*
+        const max_tokens = $('#max_tokens').val()
+        const presence_penalty = $('#presence_penalty').val()
+        const frequency_penalty = $('#frequency_penalty').val()
+        */
+
+        $.ajax({
+            url: "",
+            type: 'POST',
+            contentType: "application/json;charset=utf-8",
+            //data: JSON.stringify({"messages": messages, "timestamp": timestamp, "temperature": temperature, "max_tokens": max_tokens, "presence_penalty": presence_penalty, "frequency_penalty": frequency_penalty}),
+            data: JSON.stringify({"messages": messages, "timestamp": timestamp, "temperature": temperature}),
+            dataType: 'json',
+            success: function(res){
+                btnDisabled = false
+                messages.push(res['message'])
+
+                let msg = JSON.parse(JSON.stringify(res['message']))
+                msg['finish_reason'] = res['finish_reason']
+
+                message_shows.push(msg)
+                insertHtml(message_shows)
+                $("#count_token").text(res['usage']['prompt_tokens'])
+            },
+            error: function(){
+                btnDisabled = false
+            }
+        });
+    }
+
+
+
+</script>
+{% endblock %}

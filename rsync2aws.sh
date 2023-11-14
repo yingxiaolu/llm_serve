@@ -1,0 +1,1 @@
+rsync -avz --exclude="venv" --exclude=".git" --exclude="logs" --exclude=".idea" --exclude="__pycache__" --exclude="checkpoints" --exclude="pretrained_w" --exclude="tmp"  * ubuntu@44.240.140.3:/home/ubuntu/workshop/tom_serve/

@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  tom_serve:
+    build: .
+    image: chatgpt_serve:1.0.0
+    restart: always
+    command:
+      - /bin/sh
+      - -c
+      - "gunicorn -t 120 -w 4 -b 0.0.0.0:96 'flaskr:app'"
+    ports:
+      - "96:96"
+    environment:
+      - PYTHONUNBUFFERED=1
+    container_name: "chatgpt_serve"
+    networks:
+      - app_net
+networks:
+  app_net:

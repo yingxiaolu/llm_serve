@@ -1,0 +1,6 @@
+Flask
+Flask-Cors
+openai
+gunicorn
+PyMySQL
+numpy
