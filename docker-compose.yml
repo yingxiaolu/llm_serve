@@ -1,6 +1,6 @@
 version: "3.10"
 services:
-  tom_serve:
+  llm_serve:
     build: .
     image: llm_web_serve
     restart: always
@@ -9,7 +9,7 @@ services:
       - -c
       - "gunicorn -t 120 -w 4 -b 0.0.0.0:96 'flaskr:app'"
     ports:
-      - "96:5002"
+      - "5002:96"
     environment:
       - PYTHONUNBUFFERED=1
     container_name: "llm_web_serve"
