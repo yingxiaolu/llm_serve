@@ -1,8 +1,8 @@
-version: "3.8"
+version: "3.10"
 services:
   tom_serve:
     build: .
-    image: chatgpt_serve:1.0.0
+    image: llm_web_serve
     restart: always
     command:
       - /bin/sh
@@ -12,7 +12,7 @@ services:
       - "96:5002"
     environment:
       - PYTHONUNBUFFERED=1
-    container_name: "chatgpt_serve"
+    container_name: "llm_web_serve"
     networks:
       - app_net
 networks:
