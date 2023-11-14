@@ -1,21 +1,8 @@
-# coding=utf-8
 import json
 import urllib.request
-
-# coding=utf-8
-import json
 import urllib.request
-import json
 from icecream import ic
 # from lib.utils import get_old_content,append_save_json
-import re
-import json
-from pdfminer.high_level import extract_text
-from sklearn.datasets import make_blobs
-# import fire
-from sklearn.model_selection import train_test_split
-import json
-import re
 from flask import Flask, request, render_template
 from flask_cors import CORS
 from werkzeug.exceptions import abort
