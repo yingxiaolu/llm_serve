@@ -70,6 +70,7 @@
         let html = ''
         for(let i=0; i<messages_reverse.length; i++) {
             const msg = messages_reverse[i]
+            console.log('in insertHtml',msg['role']);
             if(msg['role'] == 'user') {
                 html += `<div class="alert alert-primary" role="alert" style="white-space: pre-line; text-align: left">${msg['content']}</div>`
             }else{
@@ -128,15 +129,14 @@
             data: JSON.stringify({"messages": messages, "timestamp": timestamp, "temperature": temperature}),
             dataType: 'json',
             success: function(res){
+                console.log('res:', res);
                 btnDisabled = false
                 messages.push(res['message'])
-
                 let msg = JSON.parse(JSON.stringify(res['message']))
-                msg['finish_reason'] = res['finish_reason']
-
+                //msg['finish_reason'] = res['finish_reason']
                 message_shows.push(msg)
                 insertHtml(message_shows)
-                $("#count_token").text(res['usage']['prompt_tokens'])
+                //$("#count_token").text(res['usage']['prompt_tokens'])
             },
             error: function(){
                 btnDisabled = false

@@ -20,11 +20,19 @@ app = Flask(__name__, static_url_path='/chatgpt_static')
 init_app(app)
 
 def llm_api_server(input_text,temperature):
+    llama_chat_prompt='''<s>[INST] <<SYS>> 
+{system_prompt} 
+<</SYS>>
+
+{user_message} [/INST]'''
+    system_prompt="You're an AI assistant"
+    user_message=input_text
+
     header = {'Content-Type': 'application/json'}
 
     data = {
           "system_prompt": "",
-          "history": input_text,
+          "history": llama_chat_prompt.format(system_prompt=system_prompt,user_message=user_message),
           "n" : 1,
           "best_of": 1, 
           "presence_penalty": 1.2, 
@@ -114,10 +122,10 @@ def index():
         db.commit()
 
         # msg = res.choices[0].message
-        msg = res
+        msg = {'content':res,'role':'assistant','finish_reason':'stop'}
         
         # return json.dumps({'message': msg, 'usage': res.usage, 'finish_reason': res.choices[0]['finish_reason']})
-        return json.dumps({'message': msg, 'usage': -1, 'finish_reason': 'No_reason'})
+        return json.dumps({'message': msg, 'usage': 0, 'finish_reason': 'stop'})
     return render_template('chatbox.html')
 
 
