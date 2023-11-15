@@ -10,7 +10,7 @@ setup(
     author='openai',
     # 作者的邮箱
     author_email='openai@outlook.com',
-    install_requires=["Flask", "Flask-Cors", "openai", "gunicorn", "PyMySQL", "numpy"],
+    install_requires=["Flask", "Flask-Cors", "openai", "gunicorn", "PyMySQL", "numpy","icecream"],
     packages=find_packages(),
     include_package_data=True,
 )

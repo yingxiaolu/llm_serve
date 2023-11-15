@@ -9,7 +9,7 @@ from werkzeug.exceptions import abort
 
 from flaskr.db import init_app, get_db
 
-MAX_NEW_TOKENS=2048
+# MAX_NEW_TOKENS=2048
 MAX_LEGTH=2048*2
 SQL_TABLE='lama'
 # import openai
@@ -44,7 +44,7 @@ def llm_api_server(input_text,temperature):
           "stop": [], 
           "ignore_eos" :False, 
           "logprobs": None,
-          "max_new_tokens": MAX_NEW_TOKENS, 
+        #   "max_new_tokens": MAX_NEW_TOKENS, 
           "max_length": MAX_LEGTH
     }
     request = urllib.request.Request(
@@ -63,8 +63,9 @@ def llm_api_server(input_text,temperature):
         
     except Exception as e:
         print(e)
-
+        
     return result
+    
 
 @app.route("/chatgpt", methods=('GET', 'POST'))
 def index():
@@ -128,7 +129,22 @@ def index():
         return json.dumps({'message': msg, 'usage': 0, 'finish_reason': 'stop'})
     return render_template('chatbox.html')
 
-
+@app.route("/api", methods=('GET', 'POST'))
+def apifun():
+    # ic(request)
+    # ic(request.data)
+    request_data = json.loads(request.data)
+    ic(request_data)
+    res='no resp'
+    history=request_data['history']
+    temperature=request_data['temperature']
+    try:
+        res=llm_api_server(history,temperature)
+    except Exception as e:
+        ic(e)
+        pass
+    return json.dumps(res)
+    
 # @app.route("/count_token", methods=('GET', 'POST'))
 # def count_token():
 #     request_data = json.loads(request.data)
