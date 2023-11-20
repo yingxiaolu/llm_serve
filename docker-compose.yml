@@ -2,6 +2,8 @@ version: "3.10"
 services:
   llm_serve:
     build: .
+    volumes:
+      - "./:/app"
     image: llm_web_serve
     restart: always
     command:

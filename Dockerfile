@@ -2,9 +2,10 @@ FROM python:3.10
 
 WORKDIR /app
 
-COPY . .
+COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+
+RUN pip install -r requirements.txt 
 
 # COPY  dist/chatgpt_serve-1.1.2-py3-none-any.whl /app/chatgpt_serve-1.1.2-py3-none-any.whl
 

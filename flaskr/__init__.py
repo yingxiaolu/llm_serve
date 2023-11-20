@@ -18,21 +18,21 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app = Flask(__name__, static_url_path='/chatgpt_static')
 init_app(app)
+import json
+import urllib.request
 
-def llm_api_server(input_text,temperature):
-    llama_chat_prompt='''<s>[INST] <<SYS>> 
-{system_prompt} 
-<</SYS>>
-
-{user_message} [/INST]'''
-    system_prompt="You're an AI assistant"
-    user_message=input_text
-
+url='http://127.0.0.1:8001/generate'
+#这个函数取自kw_extract中的api中的llama2_general_fun.py
+def api_server(input_text,url,temperature=0.4,max_length=2048*2):
+    '''
+    功能: 调用布置在某url上的大模型
+    返回: 一个字符串
+    '''
+    global llm_api_url,MAX_LENTH
     header = {'Content-Type': 'application/json'}
-
     data = {
           "system_prompt": "",
-          "history": llama_chat_prompt.format(system_prompt=system_prompt,user_message=user_message),
+          "history": input_text,
           "n" : 1,
           "best_of": 1, 
           "presence_penalty": 1.2, 
@@ -44,31 +44,29 @@ def llm_api_server(input_text,temperature):
           "stop": [], 
           "ignore_eos" :False, 
           "logprobs": None,
-        #   "max_new_tokens": MAX_NEW_TOKENS, 
-          "max_length": MAX_LEGTH
+        #   "max_new_tokens": args.max_new_tokens, 
+          "max_length": max_length
     }
     request = urllib.request.Request(
-        url='http://127.0.0.1:8001/generate',
+        url=url,
         headers=header,
         data=json.dumps(data).encode('utf-8')
     )
-
-    result = "no resp"
+    result = {"response":"this info represent error happenned","status_code":500}
     try:
         response = urllib.request.urlopen(request, timeout=300)
         res = response.read().decode('utf-8')
         result = json.loads(res)
-        # print(json.dumps(data, ensure_ascii=False, indent=2))
-        # print(json.dumps(result, ensure_ascii=False, indent=2))
-        
+        print(json.dumps(result, ensure_ascii=False, indent=2))
     except Exception as e:
         print(e)
-        
+
     return result
     
 
 @app.route("/chatgpt", methods=('GET', 'POST'))
 def index():
+    global url
     if request.method == 'POST':
         request_data = json.loads(request.data)
         messages = request_data['messages']
@@ -92,7 +90,8 @@ def index():
         db.commit()
 
         try:
-            res=llm_api_server(repr(messages[-1]['content']),temperature)
+            res=api_server(repr(messages[-1]['content']),url,temperature)
+            res=res["response"]
             ic(res)
             # if re.search(r"^\d+$", max_tokens) is not None:
             #     max_tokens = int(max_tokens)
@@ -131,6 +130,7 @@ def index():
 
 @app.route("/api", methods=('GET', 'POST'))
 def apifun():
+    global url
     # ic(request)
     # ic(request.data)
     request_data = json.loads(request.data)
@@ -139,7 +139,7 @@ def apifun():
     history=request_data['history']
     temperature=request_data['temperature']
     try:
-        res=llm_api_server(history,temperature)
+        res=api_server(history,url,temperature)
     except Exception as e:
         ic(e)
         pass
