@@ -21,7 +21,7 @@ init_app(app)
 import json
 import urllib.request
 
-url='http://127.0.0.1:8001/generate'
+url='http://0.0.0.0:8001/generate'
 #这个函数取自kw_extract中的api中的llama2_general_fun.py
 def api_server(input_text,url,temperature=0.4,max_length=2048*2):
     '''
@@ -32,7 +32,8 @@ def api_server(input_text,url,temperature=0.4,max_length=2048*2):
     header = {'Content-Type': 'application/json'}
     data = {
           "system_prompt": "",
-          "history": input_text,
+          "input": input_text,
+          "history": None,
           "n" : 1,
           "best_of": 1, 
           "presence_penalty": 1.2, 
